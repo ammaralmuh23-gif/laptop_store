@@ -72,6 +72,18 @@ DELETE FROM orders;
 DELETE FROM laptops;
 ALTER TABLE orders AUTO_INCREMENT = 1;
 ALTER TABLE laptops AUTO_INCREMENT = 1;
+-- حذف الجدول بالكامل
+DROP TABLE IF EXISTS laptops;
+
+-- إعادة إنشاء الجدول من جديد
+CREATE TABLE laptops (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    specs TEXT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    image_url LONGTEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 -- إدخال بيانات افتراضية
 INSERT IGNORE INTO admins (username, password) VALUES ('admin', 'admin123');
 INSERT IGNORE INTO settings (id, whatsapp_number) VALUES (1, '966500000000');
