@@ -1,25 +1,18 @@
 import os
 import sys
-import mysql.connector
 
 path = os.path.dirname(os.path.abspath(__file__))
 if path not in sys.path:
     sys.path.append(path)
 
-from app import app, db_config, get_db
+from app import app, get_db
 
 application = app
 
 # محاولة إنشاء الجداول تلقائياً عند التشغيل
 try:
-    # الاتصال بقاعدة البيانات
-    conn = mysql.connector.connect(
-        host=os.getenv('DB_HOST', db_config['host']),
-        port=int(os.getenv('DB_PORT', db_config.get('port', 3306))),
-        user=os.getenv('DB_USER', db_config['user']),
-        password=os.getenv('DB_PASSWORD', db_config['password']),
-        database=os.getenv('DB_NAME', db_config['database'])
-    )
+    # الاتصال بقاعدة البيانات باستخدام الدالة get_db
+    conn = get_db()
     cursor = conn.cursor()
     
     # قراءة ملف database.sql
@@ -40,3 +33,4 @@ try:
     conn.close()
 except Exception as e:
     print(f"⚠️ خطأ في إنشاء الجداول: {e}")
+
