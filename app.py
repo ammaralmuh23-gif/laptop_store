@@ -14,28 +14,26 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib import colors
-import io
 import arabic_reshaper
 from bidi.algorithm import get_display
 
-# إعدادات البريد الإلكتروني (غيرها ببياناتك)
-SENDER_EMAIL = "ammaralmuh23@gmail.com"  # بريدك الإلكتروني
-SENDER_PASSWORD = "aeso dnbm cihf huzr" # كلمة مرور التطبيق (16 حرف)
-ADMIN_EMAIL = "ammaralmuh23@gmail.com"    # البريد الذي سيستقبل الإشعارات
-
+# إعدادات البريد الإلكتروني
+SENDER_EMAIL = "ammaralmuh23@gmail.com"
+SENDER_PASSWORD = "aeso dnbm cihf huzr"
+ADMIN_EMAIL = "ammaralmuh23@gmail.com"
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_key_for_laptop_store'
 
-# إعدادات قاعدة البيانات (عدلها إذا كنت تستخدم كلمة مرور في XAMPP)
+# إعدادات قاعدة البيانات (تقرأ من متغيرات البيئة)
 def get_db():
     return mysql.connector.connect(
-        host=os.getenv('DB_HOST', db_config['host']),
-        port=int(os.getenv('DB_PORT', db_config.get('port', 3306))),
-        user=os.getenv('DB_USER', db_config['user']),
-        password=os.getenv('DB_PASSWORD', db_config['password']),
-        database=os.getenv('DB_NAME', db_config['database']),
-        ssl_disabled=True,  # <--- هذا السطر هو المهم (يتجاهل الشهادة)
+        host=os.getenv('DB_HOST', 'localhost'),
+        port=int(os.getenv('DB_PORT', 3306)),
+        user=os.getenv('DB_USER', 'root'),
+        password=os.getenv('DB_PASSWORD', ''),
+        database=os.getenv('DB_NAME', 'laptop_store'),
+        ssl_disabled=True,
         charset='utf8mb4'
     )
 
@@ -47,8 +45,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def get_db():
-    return mysql.connector.connect(**db_config)
 def send_notification(subject, body):
     try:
         admin_email = get_admin_email()
@@ -58,7 +54,6 @@ def send_notification(subject, body):
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain', 'utf-8'))
 
-        # استخدام SSL (المنفذ 465) وهو الذي نجح في الاختبار
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         server.login(SENDER_EMAIL, SENDER_PASSWORD)
         server.send_message(msg)
@@ -66,7 +61,7 @@ def send_notification(subject, body):
         print(f"✅ تم إرسال الإشعار إلى: {admin_email}")
     except Exception as e:
         print(f"❌ فشل إرسال الإشعار: {e}")
-# دالة لجلب رقم الواتساب من قاعدة البيانات
+
 def get_whatsapp_number():
     conn = get_db()
     cursor = conn.cursor(dictionary=True)
@@ -74,6 +69,7 @@ def get_whatsapp_number():
     setting = cursor.fetchone()
     conn.close()
     return setting['whatsapp_number'] if setting else '966500000000'
+
 def get_admin_email():
     conn = get_db()
     cursor = conn.cursor(dictionary=True)
@@ -81,7 +77,7 @@ def get_admin_email():
     setting = cursor.fetchone()
     conn.close()
     return setting['admin_email'] if setting and setting['admin_email'] else 'ammaralmuh23@gmail.com'
-# دالة حماية لوحة التحكم
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -101,7 +97,6 @@ def index():
     cursor.execute("SELECT * FROM laptops ORDER BY created_at DESC")
     laptops = cursor.fetchall()
     
-    # حساب عدد المنتجات في السلة للزبون الحالي
     cart_count = 0
     if 'customer_id' in session:
         cursor.execute("SELECT SUM(quantity) as total FROM cart WHERE customer_id = %s", (session['customer_id'],))
@@ -149,11 +144,7 @@ def customer_register():
         else:
             cursor.execute("INSERT INTO customers (username, password) VALUES (%s, %s)", (username, password))
             conn.commit()
-            # ... بعد cursor.execute("INSERT INTO customers...") و conn.commit()
-            send_notification(
-            "🆕 زبون جديد في متجرك", 
-            f"تم تسجيل زبون جديد باسم: {username}"
-            )
+            send_notification("🆕 زبون جديد في متجرك", f"تم تسجيل زبون جديد باسم: {username}")
             flash('تم إنشاء الحساب، يمكنك تسجيل الدخول الآن', 'success')
             return redirect(url_for('customer_login'))
         conn.close()
@@ -352,6 +343,7 @@ def logout():
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
 @app.route('/checkout', methods=['POST'])
 def checkout():
     if 'customer_id' not in session:
@@ -361,7 +353,6 @@ def checkout():
     conn = get_db()
     cursor = conn.cursor(dictionary=True)
     
-    # جلب تفاصيل السلة
     cursor.execute("""
         SELECT laptops.id as laptop_id, laptops.name, laptops.price, cart.quantity 
         FROM cart JOIN laptops ON cart.laptop_id = laptops.id 
@@ -373,28 +364,23 @@ def checkout():
         flash('السلة فارغة', 'error')
         return redirect(url_for('index'))
 
-    # حساب الإجمالي
     total = sum(item['price'] * item['quantity'] for item in items)
     
-    # 1. إنشاء الطلب في جدول orders
     cursor.execute("INSERT INTO orders (customer_id, total_price, status) VALUES (%s, %s, 'pending')", (customer_id, total))
     order_id = cursor.lastrowid
     
-    # 2. حفظ تفاصيل المنتجات في order_items
     for item in items:
         cursor.execute(
             "INSERT INTO order_items (order_id, laptop_id, quantity, price) VALUES (%s, %s, %s, %s)",
             (order_id, item['laptop_id'], item['quantity'], item['price'])
         )
     
-    # 3. إرسال الإشعار
     body = f"طلب جديد رقم #{order_id} من الزبون: {session['customer_name']}\n\n"
     for item in items:
         body += f"- {item['name']} (الكمية: {item['quantity']}) - السعر: {item['price']}$\n"
     body += f"\nالإجمالي: {total}$"
     send_notification(f"🛒 طلب شراء جديد #{order_id}", body)
     
-    # 4. مسح السلة
     cursor.execute("DELETE FROM cart WHERE customer_id = %s", (customer_id,))
     conn.commit()
     conn.close()
@@ -412,11 +398,9 @@ def my_orders():
     conn = get_db()
     cursor = conn.cursor(dictionary=True)
     
-    # جلب طلبات الزبون
     cursor.execute("SELECT * FROM orders WHERE customer_id = %s AND is_hidden = 0 ORDER BY created_at ASC", (session['customer_id'],))   
     orders = cursor.fetchall()
     
-    # جلب تفاصيل كل طلب
     for order in orders:
         cursor.execute("""
             SELECT laptops.name, order_items.quantity, order_items.price 
@@ -462,7 +446,6 @@ def hide_order(order_id):
     
     conn = get_db()
     cursor = conn.cursor()
-    # إخفاء الطلب من واجهة الزبون فقط
     cursor.execute("UPDATE orders SET is_hidden = 1 WHERE id = %s AND customer_id = %s", (order_id, session['customer_id']))
     conn.commit()
     conn.close()
@@ -479,36 +462,16 @@ def admin_reports():
     conn = get_db()
     cursor = conn.cursor(dictionary=True)
     
-    # 1. تقرير اليوم
-    cursor.execute("""
-        SELECT COUNT(*) as count, COALESCE(SUM(total_price), 0) as total 
-        FROM orders 
-        WHERE DATE(created_at) = CURDATE()
-    """)
+    cursor.execute("SELECT COUNT(*) as count, COALESCE(SUM(total_price), 0) as total FROM orders WHERE DATE(created_at) = CURDATE()")
     today_report = cursor.fetchone()
     
-    # 2. تقرير الأسبوع (آخر 7 أيام)
-    cursor.execute("""
-        SELECT COUNT(*) as count, COALESCE(SUM(total_price), 0) as total 
-        FROM orders 
-        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-    """)
+    cursor.execute("SELECT COUNT(*) as count, COALESCE(SUM(total_price), 0) as total FROM orders WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)")
     week_report = cursor.fetchone()
     
-    # 3. تقرير الشهر (الشهر الحالي)
-    cursor.execute("""
-        SELECT COUNT(*) as count, COALESCE(SUM(total_price), 0) as total 
-        FROM orders 
-        WHERE MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE())
-    """)
+    cursor.execute("SELECT COUNT(*) as count, COALESCE(SUM(total_price), 0) as total FROM orders WHERE MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE())")
     month_report = cursor.fetchone()
     
-    # 4. تقرير السنة (السنة الحالية)
-    cursor.execute("""
-        SELECT COUNT(*) as count, COALESCE(SUM(total_price), 0) as total 
-        FROM orders 
-        WHERE YEAR(created_at) = YEAR(CURDATE())
-    """)
+    cursor.execute("SELECT COUNT(*) as count, COALESCE(SUM(total_price), 0) as total FROM orders WHERE YEAR(created_at) = YEAR(CURDATE())")
     year_report = cursor.fetchone()
     
     conn.close()
@@ -519,14 +482,12 @@ def admin_reports():
                            month_report=month_report,
                            year_report=year_report)
 
-
 @app.route('/admin/reports/export/<period>')
 @login_required
 def export_reports(period):
     conn = get_db()
     cursor = conn.cursor(dictionary=True)
     
-    # تحديد الفترة الزمنية
     if period == 'today':
         query = "SELECT * FROM orders WHERE DATE(created_at) = CURDATE()"
         title = "تقرير اليوم"
@@ -546,16 +507,13 @@ def export_reports(period):
     orders = cursor.fetchall()
     conn.close()
     
-    # بناء ملف CSV
     output = io.StringIO()
-    output.write("\ufeff") # لدعم العربية
+    output.write("\ufeff")
     writer = csv.writer(output)
     
-    # العناوين
     writer.writerow([title])
     writer.writerow(["رقم الطلب", "التاريخ", "الإجمالي", "الحالة"])
     
-    # البيانات
     total_sum = 0
     for order in orders:
         status_ar = {
@@ -568,7 +526,6 @@ def export_reports(period):
         writer.writerow([order['id'], order['created_at'], order['total_price'], status_ar])
         total_sum += float(order['total_price'])
     
-    # الإجمالي
     writer.writerow([])
     writer.writerow(["الإجمالي", "", total_sum, ""])
     
@@ -609,36 +566,27 @@ def export_reports_pdf(period):
     
     total_sum = sum(float(order['total_price']) for order in orders)
     
-    # إعداد الخط العربي
     pdfmetrics.registerFont(TTFont('Arabic', 'arial.ttf'))
     
-    # دالة لمعالجة النص العربي
     def ar(text):
         reshaped = arabic_reshaper.reshape(str(text))
         return get_display(reshaped)
     
-    # إنشاء PDF
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
     
-    # --- العنوان الرئيسي ---
     p.setFont("Arabic", 22)
     p.setFillColor(colors.HexColor('#1a252f'))
     p.drawCentredString(width / 2, height - 50, ar(title))
     
-    # --- خط فاصل تحت العنوان ---
     p.setStrokeColor(colors.HexColor('#1a252f'))
     p.setLineWidth(2)
     p.line(50, height - 60, width - 50, height - 60)
     
-    # --- إعدادات الجدول (من اليمين إلى اليسار) ---
     y = height - 100
-    
-    # مواقع الأعمدة من اليمين لليسار
     col_x = [520, 380, 230, 80]  
     
-    # رسم رأس الجدول (خلفية ملونة)
     p.setFillColor(colors.HexColor('#1a252f'))
     p.rect(50, y - 5, width - 100, 25, fill=1, stroke=0)
     
@@ -649,14 +597,11 @@ def export_reports_pdf(period):
     p.drawString(col_x[2], y, ar("الإجمالي ($)"))
     p.drawString(col_x[3], y, ar("الحالة"))
     
-    # --- رسم صفوف الجدول ---
-    # --- رسم صفوف الجدول ---
     y -= 30
-    p.setFont("Arabic", 9)  # تصغير الخط من 11 إلى 9
+    p.setFont("Arabic", 9)
     p.setFillColor(colors.black)
     
     for idx, order in enumerate(orders):
-        # تلوين الصفوف بالتبادل (Zebra)
         if idx % 2 == 0:
             p.setFillColor(colors.HexColor('#f4f6f9'))
             p.rect(50, y - 5, width - 100, 20, fill=1, stroke=0)
@@ -670,7 +615,6 @@ def export_reports_pdf(period):
             'cancelled': 'ملغي'
         }.get(order['status'], order['status'])
         
-        # كتابة القيم في الأعمدة (من اليمين لليسار)
         p.drawString(col_x[0], y, f"#{order['id']}")
         p.drawString(col_x[1], y, str(order['created_at']))
         p.drawString(col_x[2], y, str(order['total_price']))
@@ -678,18 +622,15 @@ def export_reports_pdf(period):
         
         y -= 20
         
-        # رسم خط أفقي بين الصفوف
         p.setStrokeColor(colors.HexColor('#e0e0e0'))
         p.setLineWidth(0.5)
         p.line(50, y + 5, width - 50, y + 5)
     
-    # --- رسم الإطار الخارجي للجدول ---
     p.setStrokeColor(colors.HexColor('#1a252f'))
     p.setLineWidth(1)
     table_height = (len(orders) * 20) + 30
     p.rect(50, height - 105 - table_height, width - 100, table_height, fill=0, stroke=1)
     
-    # --- الإجمالي ---
     y -= 30
     p.setFont("Arabic", 14)
     p.setFillColor(colors.HexColor('#2ecc71'))
@@ -704,7 +645,6 @@ def export_reports_pdf(period):
         headers={'Content-Disposition': f'attachment; filename="report_{period}.pdf"'}
     )
 
-# --- عرض تفاصيل المنتج (للمدير) ---
 @app.route('/admin/laptop/<int:id>')
 @login_required
 def admin_view_laptop(id):
@@ -718,7 +658,6 @@ def admin_view_laptop(id):
         return redirect(url_for('admin_dashboard'))
     return render_template('admin/view_laptop.html', laptop=laptop)
 
-# --- تعديل المنتج (للمدير) ---
 @app.route('/admin/laptop/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
 def admin_edit_laptop(id):
@@ -736,8 +675,7 @@ def admin_edit_laptop(id):
         specs = request.form['specs']
         price = request.form['price']
         
-        # معالجة رفع الصورة الجديدة (اختياري)
-        image_url = laptop['image_url'] # احتفظ بالصورة القديمة افتراضياً
+        image_url = laptop['image_url']
         file = request.files.get('image')
         if file and file.filename != '' and allowed_file(file.filename):
             filename = secure_filename(file.filename)
