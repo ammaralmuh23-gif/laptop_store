@@ -29,10 +29,11 @@ app.secret_key = 'super_secret_key_for_laptop_store'
 
 # إعدادات قاعدة البيانات (عدلها إذا كنت تستخدم كلمة مرور في XAMPP)
 db_config = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': '', # اتركها فارغة إذا كنت تستخدم XAMPP
-    'database': 'laptop_store'
+    'host': os.getenv('DB_HOST', 'localhost'),
+    'port': int(os.getenv('DB_PORT', 3306)),
+    'user': os.getenv('DB_USER', 'root'),
+    'password': os.getenv('DB_PASSWORD', ''),
+    'database': os.getenv('DB_NAME', 'laptop_store')
 }
 
 # إعدادات رفع الملفات
