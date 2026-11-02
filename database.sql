@@ -66,10 +66,13 @@ CREATE TABLE IF NOT EXISTS order_items (
     FOREIGN KEY (laptop_id) REFERENCES laptops(id) ON DELETE CASCADE
 );
 
--- إدخال بيانات افتراضية
+-- إدخال البيانات الافتراضية (مرة واحدة فقط)
 INSERT IGNORE INTO admins (username, password) VALUES ('admin', 'admin123');
 INSERT IGNORE INTO settings (id, whatsapp_number) VALUES (1, '966500000000');
 DROP TABLE IF EXISTS order_items;
 DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS cart;
+DROP TABLE IF EXISTS settings;
+DROP TABLE IF EXISTS customers;
+DROP TABLE IF EXISTS admins;
 DROP TABLE IF EXISTS laptops;
-INSERT INTO admins (username, password) VALUES ('admin', 'admin123');
