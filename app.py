@@ -95,7 +95,7 @@ def login_required(f):
 def index():
     conn = get_db()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM laptops ORDER BY created_at DESC")
+    cursor.execute("SELECT * FROM laptops ORDER BY created_at ASC")
     laptops = cursor.fetchall()
     
     cart_count = 0
@@ -231,7 +231,7 @@ def view_cart():
 def admin_dashboard():
     conn = get_db()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM laptops ORDER BY created_at DESC")
+    cursor.execute("SELECT * FROM laptops ORDER BY created_at ASC")
     laptops = cursor.fetchall()
     conn.close()
     return render_template('admin/dashboard.html', laptops=laptops)
@@ -569,7 +569,7 @@ def export_reports_pdf(period):
     
     total_sum = sum(float(order['total_price']) for order in orders)
     
-    pdfmetrics.registerFont(TTFont('Arabic', 'arial.ttf'))
+    pdfmetrics.registerFont(TTFont('Arabic', 'ARIAL.TTF'))
     
     def ar(text):
         reshaped = arabic_reshaper.reshape(str(text))
