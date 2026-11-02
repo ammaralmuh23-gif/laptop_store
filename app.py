@@ -28,13 +28,16 @@ app = Flask(__name__)
 app.secret_key = 'super_secret_key_for_laptop_store'
 
 # إعدادات قاعدة البيانات (عدلها إذا كنت تستخدم كلمة مرور في XAMPP)
-db_config = {
-    'host': os.getenv('DB_HOST', 'localhost'),
-    'port': int(os.getenv('DB_PORT', 3306)),
-    'user': os.getenv('DB_USER', 'root'),
-    'password': os.getenv('DB_PASSWORD', ''),
-    'database': os.getenv('DB_NAME', 'laptop_store')
-}
+def get_db():
+    return mysql.connector.connect(
+        host=os.getenv('DB_HOST', db_config['host']),
+        port=int(os.getenv('DB_PORT', db_config.get('port', 3306))),
+        user=os.getenv('DB_USER', db_config['user']),
+        password=os.getenv('DB_PASSWORD', db_config['password']),
+        database=os.getenv('DB_NAME', db_config['database']),
+        ssl_disabled=True,  # <--- هذا السطر هو المهم (يتجاهل الشهادة)
+        charset='utf8mb4'
+    )
 
 # إعدادات رفع الملفات
 UPLOAD_FOLDER = 'uploads'
