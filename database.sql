@@ -69,4 +69,7 @@ CREATE TABLE IF NOT EXISTS order_items (
 -- إدخال بيانات افتراضية
 INSERT IGNORE INTO admins (username, password) VALUES ('admin', 'admin123');
 INSERT IGNORE INTO settings (id, whatsapp_number) VALUES (1, '966500000000');
+DROP TABLE IF EXISTS order_items;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS laptops;
 
