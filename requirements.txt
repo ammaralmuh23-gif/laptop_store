@@ -3,4 +3,5 @@ mysql-connector-python==26.10.0
 reportlab
 arabic-reshaper
 python-bidi
+resend
 gunicorn
