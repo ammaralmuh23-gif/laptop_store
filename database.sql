@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS laptops (
     name VARCHAR(100) NOT NULL,
     specs TEXT NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
-    image_url VARCHAR(255) NOT NULL,
+    image_url LONGTEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -37,23 +37,25 @@ CREATE TABLE IF NOT EXISTS cart (
     FOREIGN KEY (laptop_id) REFERENCES laptops(id) ON DELETE CASCADE
 );
 
--- 5. جدول الإعدادات (رقم الواتساب والبريد)
+-- 5. جدول الإعدادات
 CREATE TABLE IF NOT EXISTS settings (
     id INT PRIMARY KEY,
     whatsapp_number VARCHAR(20) NOT NULL,
     admin_email VARCHAR(100) DEFAULT 'ammaralmuh23@gmail.com'
 );
--- جدول الطلبات الرئيسي
+
+-- 6. جدول الطلبات
 CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT NOT NULL,
     total_price DECIMAL(10, 2) NOT NULL,
     status ENUM('pending', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_hidden TINYINT(1) DEFAULT 0,
     FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
 );
 
--- جدول تفاصيل الطلب (المنتجات داخل الطلب)
+-- 7. جدول تفاصيل الطلب
 CREATE TABLE IF NOT EXISTS order_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
@@ -63,54 +65,6 @@ CREATE TABLE IF NOT EXISTS order_items (
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
     FOREIGN KEY (laptop_id) REFERENCES laptops(id) ON DELETE CASCADE
 );
-
-ALTER TABLE orders ADD COLUMN is_hidden TINYINT(1) DEFAULT 0;
-
-ALTER TABLE laptops MODIFY COLUMN image_url LONGTEXT;
--- 1. حذف الجداول بالكامل
-DROP TABLE IF EXISTS order_items;
-DROP TABLE IF EXISTS orders;
-DROP TABLE IF EXISTS laptops;
-
--- 2. إعادة إنشاء جدول اللابتوبات
-CREATE TABLE laptops (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    specs TEXT NOT NULL,
-    price DECIMAL(10, 2) NOT NULL,
-    image_url LONGTEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- 3. إعادة إنشاء جدول الطلبات
-CREATE TABLE orders (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    customer_id INT NOT NULL,
-    total_price DECIMAL(10, 2) NOT NULL,
-    status ENUM('pending', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
-);
-
--- 4. إعادة إنشاء جدول تفاصيل الطلب
-CREATE TABLE order_items (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT NOT NULL,
-    laptop_id INT NOT NULL,
-    quantity INT NOT NULL,
-    price DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-    FOREIGN KEY (laptop_id) REFERENCES laptops(id) ON DELETE CASCADE
-);
-
--- 5. إضافة عمود is_hidden لجدول الطلبات
-ALTER TABLE orders ADD COLUMN is_hidden TINYINT(1) DEFAULT 0;
-
--- 1. حذف جميع اللابتوبات
-DELETE FROM laptops;
-
--- 2. إعادة تعيين العداد
-ALTER TABLE laptops AUTO_INCREMENT = 1;
 
 -- إدخال بيانات افتراضية
 INSERT IGNORE INTO admins (username, password) VALUES ('admin', 'admin123');
