@@ -70,6 +70,7 @@ ALTER TABLE laptops MODIFY COLUMN image_url LONGTEXT;
 DELETE FROM order_items;
 DELETE FROM orders;
 ALTER TABLE orders AUTO_INCREMENT = 1;
+ALTER TABLE laptops AUTO_INCREMENT = 1;
 -- إدخال بيانات افتراضية
 INSERT IGNORE INTO admins (username, password) VALUES ('admin', 'admin123');
 INSERT IGNORE INTO settings (id, whatsapp_number) VALUES (1, '966500000000');
