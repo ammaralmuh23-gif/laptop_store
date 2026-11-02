@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 import mysql.connector
 from functools import wraps
 import os
+import resend
 from werkzeug.utils import secure_filename
 import smtplib
 from email.mime.text import MIMEText
@@ -49,17 +50,15 @@ def allowed_file(filename):
 
 def send_notification(subject, body):
     try:
+        resend.api_key = os.getenv('RESEND_API_KEY')
         admin_email = get_admin_email()
-        msg = MIMEMultipart()
-        msg['From'] = SENDER_EMAIL
-        msg['To'] = admin_email
-        msg['Subject'] = subject
-        msg.attach(MIMEText(body, 'plain', 'utf-8'))
-
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        server.login(SENDER_EMAIL, SENDER_PASSWORD)
-        server.send_message(msg)
-        server.quit()
+        
+        resend.Emails.send({
+            "from": "onboarding@resend.dev",
+            "to": admin_email,
+            "subject": subject,
+            "text": body
+        })
         print(f"✅ تم إرسال الإشعار إلى: {admin_email}")
     except Exception as e:
         print(f"❌ فشل إرسال الإشعار: {e}")
