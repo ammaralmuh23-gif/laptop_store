@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>طلباتي</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="logo">💻 متجر اللابتوبات</div>
+        <div>
+            <a href="{{ url_for('index') }}" class="btn">الرئيسية</a>
+            <a href="{{ url_for('customer_logout') }}" class="btn btn-danger">خروج</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1>طلباتي</h1>
+        
+        {% if orders %}
+            {% for order in orders %}
+            <div class="card" style="margin-bottom: 20px; padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3>طلب رقم #{{ order.id }}</h3>
+                    
+                    <!-- زر الإخفاء (يظهر فقط إذا كانت الحالة "تم التوصيل" أو "ملغي") -->
+                    {% if order.status == 'delivered' or order.status == 'cancelled' %}
+                        <a href="{{ url_for('hide_order', order_id=order.id) }}" 
+                           class="btn-danger" 
+                           onclick="return confirm('هل تريد إخفاء هذا الطلب من سجلك؟ (سيبقى محفوظاً عند المدير)')"
+                           style="padding: 5px 15px; text-decoration: none; border-radius: 5px; font-size: 14px;">
+                           🗑️ إخفاء من سجلي
+                        </a>
+                    {% endif %}
+                </div>
+                
+                <p>التاريخ: {{ order.created_at }}</p>
+                <p>الإجمالي: <strong>{{ order.total_price }} $</strong></p>
+                
+                <p>الحالة: 
+                    {% if order.status == 'pending' %}
+                        <span style="color: #f39c12; font-weight: bold;">⏳ قيد المعالجة</span>
+                    {% elif order.status == 'shipped' %}
+                        <span style="color: #3498db; font-weight: bold;">🚚 تم الشحن</span>
+                    {% elif order.status == 'delivered' %}
+                        <span style="color: #2ecc71; font-weight: bold;">✅ تم التوصيل</span>
+                    {% elif order.status == 'cancelled' %}
+                        <span style="color: #e74c3c; font-weight: bold;">❌ ملغي</span>
+                    {% endif %}
+                </p>
+                
+                <h4>المنتجات:</h4>
+                <ul>
+                    {% for item in order.products %}
+                    <li>{{ item.name }} - الكمية: {{ item.quantity }} - السعر: {{ item.price }} $</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>لا توجد طلبات سابقة. <a href="{{ url_for('index') }}">تسوق الآن</a></p>
+        {% endif %}
+    </main>
+</body>
+</html>

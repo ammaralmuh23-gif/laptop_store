@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>عرض المنتج</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="logo">💻 لوحة تحكم المدير</div>
+        <div>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn">العودة للمنتجات</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1>عرض المنتج: {{ laptop.name }}</h1>
+        
+        <div class="product-detail" style="display: flex; gap: 30px; padding: 20px; background: white; border-radius: 10px;">
+            <div style="flex: 1;">
+                <img src="{{ laptop.image_url }}" alt="{{ laptop.name }}" style="width: 100%; border-radius: 10px;">
+            </div>
+            <div style="flex: 1;">
+                <h2>{{ laptop.name }}</h2>
+                <p><strong>المواصفات:</strong> {{ laptop.specs }}</p>
+                <p><strong>السعر:</strong> {{ laptop.price }} $</p>
+                <p><strong>تاريخ الإضافة:</strong> {{ laptop.created_at }}</p>
+                
+                <div style="margin-top: 20px;">
+                    <a href="{{ url_for('admin_edit_laptop', id=laptop.id) }}" class="btn-success" style="padding: 10px 20px; text-decoration: none; border-radius: 5px;">تعديل المنتج</a>
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn" style="padding: 10px 20px; text-decoration: none; border-radius: 5px;">رجوع</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

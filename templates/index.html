@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>متجر اللابتوبات</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="logo">💻 متجر اللابتوبات</div>
+        
+        <!-- شريط البحث -->
+        <form action="{{ url_for('search') }}" method="GET" class="search-form">
+            <input type="text" name="q" placeholder="ابحث عن لابتوب..." value="{{ search_query or '' }}">
+            <button type="submit">بحث</button>
+        </form>
+
+        <!-- أزرار المستخدم (زبون / مدير) -->
+        <div >
+            {% if session.customer_name %}
+                <span style="color:white; margin-left:15px; ">مرحباً، {{ session.customer_name }}</span>
+                <a href="{{ url_for('view_cart') }}" class="btn" style="position: relative; margin-left:15px; ">
+    🛒 السلة
+    {% if cart_count > 0 %}
+        <span style="position: absolute; top: -8px; right: -8px; background-color: #e74c3c; color: white; border-radius: 50%; padding: 2px 8px; font-size: 12px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">
+            {{ cart_count }}
+        </span>
+    {% endif %}
+</a>
+        <a href="{{ url_for('my_orders') }}" class="btn">📦 طلباتي</a>
+                <a href="{{ url_for('customer_logout') }}" class="btn btn-danger" style="margin-left:15px;">خروج</a>
+            {% else %}
+                <a href="{{ url_for('customer_login') }}" class="btn">تسجيل دخول الزبون</a>
+            {% endif %}
+            <a href="{{ url_for('login') }}" class="btn-admin">دخول المدير</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1>{% if search_query %}نتائج البحث عن: {{ search_query }}{% else %}أحدث اللابتوبات{% endif %}</h1>
+        <div class="grid">
+            {% for laptop in laptops %}
+            <div class="card">
+                <a href="{{ url_for('product_detail', id=laptop.id) }}">
+                    <img src="{{ laptop.image_url }}" alt="{{ laptop.name }}">
+                </a>
+                <div class="card-body">
+                    <h3><a href="{{ url_for('product_detail', id=laptop.id) }}" style="text-decoration:none; color:inherit;">{{ laptop.name }}</a></h3>
+                    <p class="specs">{{ laptop.specs }}</p>
+                    <p class="price">{{ laptop.price }} $</p>
+                    <!-- تم تعديل المتغير ليكون laptop_id ليتوافق مع الكود الجديد في app.py -->
+                    <a href="{{ url_for('add_to_cart', laptop_id=laptop.id) }}" class="btn-success" style="width:100%; text-align:center; display:block; margin-top:10px;">+ أضف إلى السلة</a>
+                </div>
+            </div>
+            {% else %}
+            <p>لا توجد لابتوبات حالياً.</p>
+            {% endfor %}
+        </div>
+    </main>
+</body>
+</html>

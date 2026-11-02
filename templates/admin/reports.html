@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تقارير المبيعات</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="logo">💻 لوحة تحكم المدير</div>
+        <div>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn">المنتجات</a>
+            <a href="{{ url_for('admin_orders') }}" class="btn">الطلبات</a>
+            <a href="{{ url_for('admin_settings') }}" class="btn">الإعدادات</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-danger">خروج</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1>📊 تقارير المبيعات</h1>
+        
+        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); margin-top: 20px;">
+            
+            <!-- تقرير اليوم -->
+            <div class="card" style="padding: 20px; text-align: center;">
+                <h3>📅 اليوم</h3>
+                <p style="font-size: 32px; color: #2ecc71; font-weight: bold;">{{ today_report.total }} $</p>
+                <p>عدد الطلبات: {{ today_report.count }}</p>
+            </div>
+
+            <!-- تقرير الأسبوع -->
+            <div class="card" style="padding: 20px; text-align: center;">
+                <h3>📆 آخر 7 أيام</h3>
+                <p style="font-size: 32px; color: #3498db; font-weight: bold;">{{ week_report.total }} $</p>
+                <p>عدد الطلبات: {{ week_report.count }}</p>
+            </div>
+
+            <!-- تقرير الشهر -->
+            <div class="card" style="padding: 20px; text-align: center;">
+                <h3>🗓️ هذا الشهر</h3>
+                <p style="font-size: 32px; color: #f39c12; font-weight: bold;">{{ month_report.total }} $</p>
+                <p>عدد الطلبات: {{ month_report.count }}</p>
+            </div>
+
+            <!-- تقرير السنة -->
+            <div class="card" style="padding: 20px; text-align: center;">
+                <h3>📊 هذه السنة</h3>
+                <p style="font-size: 32px; color: #e74c3c; font-weight: bold;">{{ year_report.total }} $</p>
+                <p>عدد الطلبات: {{ year_report.count }}</p>
+            </div>
+        </div>
+
+        <!-- أزرار التصدير -->
+        <div style="margin-top: 30px; text-align: center;">
+            <h3>تصدير تقارير Excel</h3>
+            <a href="{{ url_for('export_reports', period='today') }}" class="btn-success" style="padding: 10px 20px; margin: 5px;">تصدير اليوم (CSV)</a>
+            <a href="{{ url_for('export_reports', period='week') }}" class="btn-success" style="padding: 10px 20px; margin: 5px;">تصدير الأسبوع (CSV)</a>
+            <a href="{{ url_for('export_reports', period='month') }}" class="btn-success" style="padding: 10px 20px; margin: 5px;">تصدير الشهر (CSV)</a>
+            <a href="{{ url_for('export_reports', period='year') }}" class="btn-success" style="padding: 10px 20px; margin: 5px;">تصدير السنة (CSV)</a>
+       
+            <h3 style="margin-top: 40px;margin:20px ;">تصدير PDF</h3>
+<a href="{{ url_for('export_reports_pdf', period='today') }}" class="btn-danger" style="padding: 10px 20px; margin: 5px;">تصدير اليوم (PDF)</a>
+<a href="{{ url_for('export_reports_pdf', period='week') }}" class="btn-danger" style="padding: 10px 20px; margin: 5px;">تصدير الأسبوع (PDF)</a>
+<a href="{{ url_for('export_reports_pdf', period='month') }}" class="btn-danger" style="padding: 10px 20px; margin: 5px;">تصدير الشهر (PDF)</a>
+<a href="{{ url_for('export_reports_pdf', period='year') }}" class="btn-danger" style="padding: 10px 20px; margin: 5px;">تصدير السنة (PDF)</a>
+        </div>
+    </main>
+</body>
+</html>

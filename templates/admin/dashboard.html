@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة التحكم</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="logo">لوحة تحكم المدير</div>
+        <div>
+            
+            <a href="{{ url_for('index') }}" class="btn">عرض المتجر</a>
+            <a href="{{ url_for('admin_reports') }}" class="btn">📊 التقارير</a>
+            <a href="{{ url_for('admin_orders') }}" class="btn">📦 إدارة الطلبات</a>
+            <a href="{{ url_for('admin_settings') }}" class="btn">⚙️ إعدادات المتجر</a>
+            <a href="{{ url_for('logout') }}" class="btn btn-danger">خروج</a>
+        </div>
+    </header>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <h2>إدارة اللابتوبات</h2>
+        <a href="{{ url_for('add_laptop') }}" class="btn btn-success">+ إضافة لابتوب جديد</a>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>الصورة</th>
+                    <th>الاسم</th>
+                    <th>المواصفات</th>
+                    <th>السعر</th>
+                    <th>إجراء</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for laptop in laptops %}
+                <tr>
+                    <td>{{ laptop.id }}</td>
+                    <td><img src="{{ laptop.image_url }}" width="50"></td>
+                    <td>{{ laptop.name }}</td>
+                    <td>{{ laptop.specs }}</td>
+                    <td>{{ laptop.price }} $</td>
+<td>
+    <a href="{{ url_for('admin_view_laptop', id=laptop.id) }}" class="btn" style="padding: 5px 10px; background: #3498db; color: white; text-decoration: none; border-radius: 3px; font-size: 13px;">عرض</a>
+    
+    <a href="{{ url_for('admin_edit_laptop', id=laptop.id) }}" class="btn" style="padding: 5px 10px; background: #f39c12; color: white; text-decoration: none; border-radius: 3px; font-size: 13px;">تعديل</a>
+    
+    <a href="{{ url_for('delete_laptop', id=laptop.id) }}" class="btn-danger" onclick="return confirm('حذف المنتج؟')" style="padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 13px;">حذف</a>
+</td>                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>

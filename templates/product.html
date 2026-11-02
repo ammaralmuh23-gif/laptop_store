@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ laptop.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="logo">💻 متجر اللابتوبات</div>
+        <div>
+            <a href="{{ url_for('index') }}" class="btn">الرئيسية</a>
+            <a href="{{ url_for('view_cart') }}" class="btn">🛒 السلة</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="product-detail">
+            <div class="product-image">
+                <img src="{{ laptop.image_url }}" alt="{{ laptop.name }}">
+            </div>
+            <div class="product-info">
+                <h1>{{ laptop.name }}</h1>
+                <p class="price" style="font-size: 24px;">{{ laptop.price }} $</p>
+                <h3>المواصفات:</h3>
+                <p>{{ laptop.specs }}</p>
+                
+                <div style="margin-top: 20px;">
+                    <a href="{{ url_for('add_to_cart', id=laptop.id) }}" class="btn-success" style="padding: 15px 30px; font-size: 18px;">+ أضف إلى السلة</a>
+                </div>
+
+                <!-- رقم التواصل مع الشركة -->
+                <div class="contact-box">
+                    <h3>هل تريد الاستفسار؟</h3>
+                    <p>تواصل معنا مباشرة:</p>
+                    <a href="https://wa.me/{{ whatsapp_number }}" target="_blank" class="btn-whatsapp">📞 واتساب: {{ whatsapp_number }}</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

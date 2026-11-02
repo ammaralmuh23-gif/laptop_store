@@ -1,0 +1,6 @@
+Flask==3.0.3
+mysql-connector-python==26.10.0
+reportlab
+arabic-reshaper
+python-bidi
+gunicorn

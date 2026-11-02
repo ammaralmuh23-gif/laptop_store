@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تسجيل دخول الزبون</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* تنسيق قسري ومحكم للحقل والأيقونة */
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .password-wrapper input {
+            width: 100% !important;
+            height: 45px !important;
+            padding: 10px 10px 10px 45px !important; /* مساحة للأيقونة */
+            border: 1px solid #ccc !important;
+            border-radius: 5px !important;
+            font-size: 16px !important;
+            box-sizing: border-box !important;
+        }
+        .eye-btn {
+            position: absolute !important;
+            left: 10px !important;
+            top: 42% !important;
+            transform: translateY(-50%) !important;
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
+            cursor: pointer !important;
+            width: 30px !important;
+            height: 30px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 999 !important;
+        }
+        .eye-btn svg {
+            width: 22px !important;
+            height: 22px !important;
+            color: #333 !important;
+            display: block !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2>تسجيل دخول الزبون</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+        <form method="POST">
+            <label>اسم المستخدم</label>
+            <input type="text" name="username" required style="width:100%; padding:10px; margin-bottom:20px; border:1px solid #ccc; border-radius:5px;">
+            
+            <label>كلمة المرور</label>
+            <div class="password-wrapper">
+                <input type="password" id="password" name="password" required>
+                <button type="button" class="eye-btn" onclick="togglePassword('password', this)">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                </button>
+            </div>
+
+            <button type="submit" style="width:100%; padding:10px; background:#2ecc71; color:white; border:none; border-radius:5px; font-size:16px; margin-top:10px; cursor:pointer;">دخول</button>
+        </form>
+        <a href="{{ url_for('customer_register') }}">إنشاء حساب جديد</a>
+        <a href="{{ url_for('index') }}">العودة للمتجر</a>
+    </div>
+
+    <script>
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const eyeOpen = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>`;
+            const eyeClosed = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>`;
+            if (input.type === "password") {
+                input.type = "text";
+                btn.innerHTML = eyeClosed;
+            } else {
+                input.type = "password";
+                btn.innerHTML = eyeOpen;
+            }
+        }
+    </script>
+</body>
+</html>

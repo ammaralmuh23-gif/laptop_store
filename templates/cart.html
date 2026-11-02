@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>سلة المشتريات</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="logo">💻 متجر اللابتوبات</div>
+        <a href="{{ url_for('index') }}" class="btn">الرئيسية</a>
+    </header>
+
+    <main class="container">
+        <h1>سلة المشتريات</h1>
+        
+        {% if laptops %}
+        <table>
+            <thead>
+                <tr>
+                    <th>الصورة</th>
+                    <th>المنتج</th>
+                    <th>السعر</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for laptop in laptops %}
+                <tr>
+                    <td><img src="{{ laptop.image_url }}" width="60"></td>
+                    <td>{{ laptop.name }}</td>
+                    <td>{{ laptop.price }} $</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <h2 style="text-align: left; margin-top: 20px;">الإجمالي: {{ total }} $</h2>
+        <!-- أزرار الطلب -->
+<div style="display: flex; flex-direction: column; gap: 15px; max-width: 300px; margin-top: 20px;">
+    
+    <!-- زر إرسال الطلب للمدير -->
+    <form action="{{ url_for('checkout') }}" method="POST" style="margin: 0;">
+        <button type="submit" class="btn-success" style="width: 100%; padding: 15px; font-size: 18px; border: none; cursor: pointer;">📩 إرسال الطلب للمدير</button>
+    </form>
+
+    <!-- زر الواتساب -->
+    <a href="https://wa.me/{{ whatsapp_number }}?text=أريد%20شراء%20اللابتوبات%20التالية" target="_blank" class="btn-whatsapp" style="width: 100%; text-align: center; padding: 15px; font-size: 18px; display: block;">إتمام الطلب عبر واتساب</a>
+
+</div>
+        {% else %}
+        <p>السلة فارغة. <a href="{{ url_for('index') }}">تصفح المنتجات</a></p>
+        {% endif %}
+    </main>
+</body>
+</html>

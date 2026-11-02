@@ -1,0 +1,123 @@
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+body { background-color: #f4f6f9; color: #333; }
+
+header {
+    background-color: #1a252f;
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    flex-wrap: wrap; /* السماح بالالتفاف في الشاشات الصغيرة */
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px; /* مسافة بين العناصر */
+}
+
+header > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* مسافة بين الأزرار */
+    align-items: center;
+}
+
+/* شريط البحث */
+.search-form {
+    display: flex;
+    gap: 5px;
+    margin: 0;
+}.logo { font-size: 22px; font-weight: bold; }
+.btn, .btn-admin { background-color: #3498db; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; }
+.btn-danger { background-color: #e74c3c; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px; }
+.btn-success { background-color: #2ecc71; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; display: inline-block; margin-bottom: 15px; }
+
+.container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+h1 { margin-bottom: 20px; color: #1a252f; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+.card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.2s; }
+.card:hover { transform: translateY(-5px); }
+.card img { width: 100%; height: 200px; object-fit: cover; }
+.card-body { padding: 15px; }
+.card-body h3 { margin-bottom: 10px; color: #2c3e50; }
+.specs { color: #7f8c8d; font-size: 14px; margin-bottom: 10px; }
+.price { color: #e74c3c; font-size: 18px; font-weight: bold; }
+
+/* تصميم صفحة الدخول والإضافة */
+.login-box { background: white; width: 400px; margin: 100px auto; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.login-box h2 { text-align: center; margin-bottom: 20px; }
+.login-box label { display: block; margin-bottom: 5px; font-weight: bold; }
+.login-box input, .login-box textarea { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; }
+
+/* تم التعديل هنا: تطبيق التنسيق على زر الإرسال فقط، وليس كل الأزرار */
+.login-box button[type="submit"] { width: 100%; padding: 10px; background-color: #2ecc71; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+.login-box a { display: block; text-align: center; margin-top: 15px; color: #3498db; text-decoration: none; }
+
+/* الجداول */
+table { width: 100%; background: white; border-collapse: collapse; margin-top: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+th, td { padding: 12px; text-align: right; border-bottom: 1px solid #eee; }
+th { background-color: #1a252f; color: white; }
+
+/* رسائل التنبيه */
+.flash { padding: 10px; margin-bottom: 15px; border-radius: 5px; text-align: center; }
+.flash.success { background-color: #d4edda; color: #155724; }
+.flash.error { background-color: #f8d7da; color: #721c24; }
+
+/* شريط البحث */
+.search-form { display: flex; gap: 5px; }
+.search-form input { padding: 8px; border-radius: 5px; border: none; width: 250px; }
+.search-form button { padding: 8px 15px; background-color: #f39c12; color: white; border: none; border-radius: 5px; cursor: pointer; }
+
+/* صفحة التفاصيل */
+.product-detail { display: flex; gap: 40px; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.product-image { flex: 1; }
+.product-image img { width: 100%; border-radius: 10px; }
+.product-info { flex: 1; }
+.contact-box { margin-top: 30px; padding: 20px; background: #f9f9f9; border-radius: 8px; border-right: 4px solid #25D366; }
+
+/* زر الواتساب */
+.btn-whatsapp { display: inline-block; background-color: #25D366; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px; }
+.btn-whatsapp:hover { background-color: #128C7E; }
+
+/* ========================================= */
+/* إصلاح زر العين داخل حقل كلمة المرور */
+/* ========================================= */
+.password-container {
+    position: relative;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.password-container input {
+    width: 100%;
+    padding: 10px;
+    padding-left: 40px; /* مساحة للأيقونة */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 16px;
+    height: 45px; /* ارتفاع ثابت */
+}
+
+.toggle-password {
+    position: absolute;
+    left: 12px;
+    top: 50%; /* المنتصف تماماً */
+    transform: translateY(-50%);
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    cursor: pointer;
+    color: #666 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px !important;
+    height: 24px !important;
+    z-index: 10;
+}
+
+.toggle-password svg {
+    width: 20px !important;
+    height: 20px !important;
+    display: block !important;
+    pointer-events: none;
+}
