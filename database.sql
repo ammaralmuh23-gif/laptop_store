@@ -69,6 +69,7 @@ ALTER TABLE orders ADD COLUMN is_hidden TINYINT(1) DEFAULT 0;
 ALTER TABLE laptops MODIFY COLUMN image_url LONGTEXT;
 DELETE FROM order_items;
 DELETE FROM orders;
+DELETE FROM laptops;
 ALTER TABLE orders AUTO_INCREMENT = 1;
 ALTER TABLE laptops AUTO_INCREMENT = 1;
 -- إدخال بيانات افتراضية
