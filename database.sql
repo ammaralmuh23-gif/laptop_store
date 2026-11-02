@@ -105,6 +105,13 @@ CREATE TABLE order_items (
 
 -- 5. إضافة عمود is_hidden لجدول الطلبات
 ALTER TABLE orders ADD COLUMN is_hidden TINYINT(1) DEFAULT 0;
+
+-- 1. حذف جميع اللابتوبات
+DELETE FROM laptops;
+
+-- 2. إعادة تعيين العداد
+ALTER TABLE laptops AUTO_INCREMENT = 1;
+
 -- إدخال بيانات افتراضية
 INSERT IGNORE INTO admins (username, password) VALUES ('admin', 'admin123');
 INSERT IGNORE INTO settings (id, whatsapp_number) VALUES (1, '966500000000');
