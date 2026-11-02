@@ -65,6 +65,10 @@ CREATE TABLE IF NOT EXISTS order_items (
 );
 
 ALTER TABLE orders ADD COLUMN is_hidden TINYINT(1) DEFAULT 0;
+
+ALTER TABLE laptops MODIFY COLUMN image_url LONGTEXT;
+
 -- إدخال بيانات افتراضية
 INSERT IGNORE INTO admins (username, password) VALUES ('admin', 'admin123');
 INSERT IGNORE INTO settings (id, whatsapp_number) VALUES (1, '966500000000');
+
