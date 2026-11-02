@@ -33,8 +33,8 @@ def get_db():
         user=os.getenv('DB_USER', 'root'),
         password=os.getenv('DB_PASSWORD', ''),
         database=os.getenv('DB_NAME', 'laptop_store'),
-        ssl_verify_cert=False,  # <--- تفعيل SSL بدون التحقق من الشهادة
-        ssl_disabled=False,     # <--- تفعيل SSL
+        ssl_verify_cert=False,
+        ssl_disabled=False,
         charset='utf8mb4'
     )
 
