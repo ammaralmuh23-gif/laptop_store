@@ -16,6 +16,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib import colors
 import arabic_reshaper
 from bidi.algorithm import get_display
+import base64
 
 # إعدادات البريد الإلكتروني
 SENDER_EMAIL = "ammaralmuh23@gmail.com"
@@ -246,11 +247,13 @@ def add_laptop():
         
         file = request.files['image']
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            image_url = f'/uploads/{filename}'
+            # تحويل الصورة إلى Base64
+            image_data = file.read()
+            image_base64 = base64.b64encode(image_data).decode('utf-8')
+            extension = file.filename.rsplit('.', 1)[1].lower()
+            image_url = f"data:image/{extension};base64,{image_base64}"
         else:
-            flash('الرجاء اختيار صورة صالحة (png, jpg, jpeg, gif)', 'error')
+            flash('الرجاء اختيار صورة صالحة', 'error')
             return redirect(request.url)
 
         conn = get_db()
