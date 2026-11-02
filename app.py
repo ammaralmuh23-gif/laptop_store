@@ -696,7 +696,8 @@ def admin_edit_laptop(id):
     conn.close()
     return render_template('admin/edit_laptop.html', laptop=laptop)
 
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
 if __name__ == '__main__':
-    if not os.path.exists(UPLOAD_FOLDER):
-        os.makedirs(UPLOAD_FOLDER)
     app.run(debug=True)
