@@ -67,6 +67,8 @@ CREATE TABLE IF NOT EXISTS order_items (
 ALTER TABLE orders ADD COLUMN is_hidden TINYINT(1) DEFAULT 0;
 
 ALTER TABLE laptops MODIFY COLUMN image_url LONGTEXT;
+DELETE FROM order_items;
+DELETE FROM orders;
 ALTER TABLE orders AUTO_INCREMENT = 1;
 -- إدخال بيانات افتراضية
 INSERT IGNORE INTO admins (username, password) VALUES ('admin', 'admin123');
